@@ -1,7 +1,7 @@
 package server
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"github.com/russross/blackfriday"
 	"net/http"
 	"web/template"
@@ -48,7 +48,7 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 func getHandler(w http.ResponseWriter, req *http.Request) {
-	
+	defer req.Body.Close()
 	crossDomain(w)
 	v, err := parseRequestJSON(req)
 	if err != nil {
@@ -70,16 +70,12 @@ func getHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		w.Write(bs)
 	} else {
-		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
+		http.Error(w, ERROR_NOT_PERMISSION, http.StatusNotAcceptable)
 		return
 	}
 }
 func updateHandler(w http.ResponseWriter, req *http.Request) {
-	defer func() {
-		if err := recover(); err != nil {
-			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-		}
-	}()
+	defer req.Body.Close()
 	crossDomain(w)
 	v, err := parseRequestJSON(req)
 	if err != nil {
@@ -100,13 +96,8 @@ func updateHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	} else {
-		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
+		http.Error(w, ERROR_NOT_PERMISSION, http.StatusNotAcceptable)
 		return
 	}
-	defer func() {
-		if err := recover(); err != nil {
-			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-		}
-	}()
 }
 // go run /home/psycho/go/src/web/server/article.go

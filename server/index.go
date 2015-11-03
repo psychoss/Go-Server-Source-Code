@@ -19,7 +19,7 @@ type Item struct {
 }
 // the extension function use by the template engine
 func (i *Item) BuildLanguage() (map[string]string, error) {
-	return map[string]string{"Language": strings.Split(i.Href, "-")[0], "Mark": util.String.Substr(i.Href, 0, 1)}, nil
+	return map[string]string{"Language": strings.Split(i.Href, "-")[0], "Mark": util.Substr(i.Href, 0, 1)}, nil
 }
 // the struct to filter and process the datas return by the leveldb
 type Filter struct {
@@ -58,7 +58,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	go cacheFile(PATH_CACHE+"index"+EXTENSION_HTML, content)
 }
 func getAddition(prefix string) string {
-	key := []byte(prefix + util.Time.NowShortDateTime())
+	key := []byte(prefix + util.NowShortDateTime())
 	bs, err := leveldb.Get(key)
 	if err != nil || len(bs) == 0 {
 		key = []byte(prefix + "default")

@@ -49,7 +49,9 @@ func filter(w http.ResponseWriter, req *http.Request) {
 		fecthHandler(w, req)
 	}
 	if req.Method == "POST" {
-		if url == "/update" {
+		if url == "/comment" {
+			putCommentHandler(w, req)
+		} else if url == "/update" {
 			updateHandler(w, req)
 		} else if url == "/post" {
 			getHandler(w, req)

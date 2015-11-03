@@ -1,8 +1,6 @@
 package util
-type utilString struct {
-}
-var String = utilString{}
-func (*utilString) ContainsString(s []string, e string) bool {
+
+func ContainsString(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -10,7 +8,7 @@ func (*utilString) ContainsString(s []string, e string) bool {
 	}
 	return false
 }
-func (*utilString) Substr(s string, pos, length int) string {
+func Substr(s string, pos, length int) string {
 	runes := []rune(s)
 	l := pos + length
 	if l > len(runes) {

@@ -11,16 +11,17 @@ func NewToken(username, secret string) (string, error) {
 	}
 	return token, nil
 }
-func CheckToken(tokenstr, secret string) (string, bool, error) {
+func CheckToken(tokenstr, secret string) (bool, error) {
 	token, err := jwt.Parse(tokenstr, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
 	if err != nil {
-		return "", false, nil
+		return false, err
 	}
 	if token.Valid {
-		return token.Claims["username"].(string), true, nil
+		return true, nil
+		//return token.Claims["username"].(string), true, nil
 	}
-	return "", false, nil
+	return false, nil
 }
 // go run /home/psycho/go/src/web/jwt/jwt.go

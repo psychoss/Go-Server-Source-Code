@@ -17,6 +17,7 @@ func getRequiredDatas(req *http.Request) ([]byte, []byte, error) {
 // For the user sign in.
 func signinHandler(w http.ResponseWriter, req *http.Request) {
 	id, password, err := getRequiredDatas(req)
+	defer req.Body.Close()
 	if err != nil {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
@@ -43,30 +44,31 @@ func signinHandler(w http.ResponseWriter, req *http.Request) {
 func signupHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse the username and password from the request body
 	id, password, err := getRequiredDatas(req)
+	defer req.Body.Close()
 	// if error is not a nil
 	// end the function immediately after sending the response
 	if err != nil {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
 	}
-    // append the prefix
+	// append the prefix
 	id = append([]byte(PREFIX_USER), id[0:]...)
-    // check if the username have been used
+	// check if the username have been used
 	lbs, err := leveldb.Get(id)
 	if err != nil {
 		http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 		return
 	}
-    // if the username is not used
+	// if the username is not used
 	if len(lbs) == 0 {
 		err := leveldb.Put(id, password)
 		if err != nil {
 			http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 			return
 		}
-	    // make the token for the response
-        // the token only include the username and the hash which for use by the validator
-        token, err := jwt.NewToken(string(id[len([]byte(PREFIX_USER)):]), string(secret))
+		// make the token for the response
+		// the token only include the username and the hash which for use by the validator
+		token, err := jwt.NewToken(string(id[len([]byte(PREFIX_USER)):]), string(secret))
 		if err != nil {
 			http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 			return
