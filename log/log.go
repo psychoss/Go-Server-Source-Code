@@ -24,6 +24,7 @@ func New(out io.Writer) *Logger {
 	return &Logger{out: out}
 }
 func Fatalln(message string) {
+    std.OutPut(message)
 	os.Exit(1)
 }
 func Print(message string) {

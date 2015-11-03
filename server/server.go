@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"web/level"
+	"web/log"
 	"web/rubex"
 )
 var (
@@ -17,6 +18,7 @@ var (
 	staticRxp *rubex.Regexp
 	// the wrapper for leveldb
 	leveldb *level.Level
+	secret  []byte
 )
 // the holder for request handler
 type RequestHandler struct {
@@ -53,6 +55,8 @@ func filter(w http.ResponseWriter, req *http.Request) {
 			getHandler(w, req)
 		} else if url == "/signin" {
 			signinHandler(w, req)
+		} else if url == "/signup" {
+			signupHandler(w, req)
 		}
 	}
 }
@@ -79,6 +83,10 @@ func StartNewServer(address string) error {
 	}
 	rxp = rubex.MustCompile("^/(?:css|go|mongo|node|python|rethinkdb|rust)[\\-a-zA-Z0-9/]*$")
 	staticRxp = rubex.MustCompile("\\.(?:jpg|jpeg|png|gif|woff2|woff|js|css|html|ico)$")
+	secret, err = leveldb.Get([]byte(KEY_ADMIN_CERTIFICATION_TOKEN))
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 	return http.ListenAndServe(address, serverHandler)
 }
 // go run /home/psycho/go/src/web/server/server.go
