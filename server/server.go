@@ -26,17 +26,18 @@ func filter(w http.ResponseWriter, req *http.Request) {
 	} else if rxp.Match(bu) {
 		fecthHandler(w, req)
 	}
-    if req.Method=="POST"{
-        if url=="/update"{
-        updateHandler(w,req)
-        } else if url =="/post" {
-            getHandler(w,req)
-        }
-    }
+	if req.Method == "POST" {
+		if url == "/update" {
+			updateHandler(w, req)
+		} else if url == "/post" {
+			getHandler(w, req)
+		}
+	}
 	fmt.Println(url)
 }
+// Cache the file for nginx
 func cacheFile(fileName string, datas []byte) {
-	ioutil.WriteFile(CACHE_PATH+fileName+".html", datas, 07777)
+	ioutil.WriteFile(PATH_CACHE+fileName+".html", datas, 07777)
 }
 // 允许跨域方法
 // Allow cross
@@ -49,11 +50,10 @@ func Close() {
 func StartNewServer(address string) error {
 	var err error
 	serverHandler := &RequestHandler{}
-	leveldb, err = level.New(DBPATH)
+	leveldb, err = level.New(PATH_DB)
 	if err != nil {
 		return err
 	}
- 
 	rxp = rubex.MustCompile("^/(?:css|go|mongo|node|python|rethinkdb|rust)[\\-a-zA-Z0-9/]*$")
 	staticRxp = rubex.MustCompile("\\.(?:jpg|jpeg|png|gif|woff2|woff|js|css|html|ico)$")
 	return http.ListenAndServe(address, serverHandler)

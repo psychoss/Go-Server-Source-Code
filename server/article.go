@@ -13,20 +13,20 @@ func convertToHTML(input []byte) string {
 }
 func fecthHandler(w http.ResponseWriter, req *http.Request) {
 	url := req.URL.Path
-	layout, err := template.ParseFile(PUBLIC_PATH + LAYOUT_TEMPLATE_FILE)
+	layout, err := template.ParseFile(PATH_PUBLIC + TEMPLATE_LAYOUT)
 	if err != nil {
-		http.Error(w, TEMPLATE_FILE_NOT_FOUND, http.StatusNotFound)
+		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
-	artical, err := template.ParseFile(PUBLIC_PATH + ARTICAL_TEMPLATE_FILE)
+	artical, err := template.ParseFile(PATH_PUBLIC + TEMPLATE_ARTICAL)
 	if err != nil {
-		http.Error(w, TEMPLATE_FILE_NOT_FOUND, http.StatusNotFound)
+		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
 	key := bytes.Trim([]byte(url), "/")
 	bs, err := leveldb.Get(key)
 	if err != nil {
-		http.Error(w, TEMPLATE_FILE_NOT_FOUND, http.StatusNotFound)
+		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
 	sps := bytes.Split(bs, []byte(DELIMITER))
@@ -42,9 +42,10 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 			Url:         BASE_URL + string(key) + "/",
 		}
 		content := []byte(artical.RenderInLayout(layout, &page))
+        go cacheFile(PATH_CACHE +string(key) +EXTENSION_HTML,content)
 		w.Write(content)
 	} else {
-		http.Error(w, TEMPLATE_FILE_NOT_FOUND, http.StatusNotFound)
+		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
 }

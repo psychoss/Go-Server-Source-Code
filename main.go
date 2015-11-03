@@ -7,6 +7,7 @@ import (
 	"web/server"
 )
 const (
+    // the log file path
 	LOG_FILE = "app.log"
     // the address 
 	ADDRESS   = "localhost:9091"

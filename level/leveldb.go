@@ -133,9 +133,14 @@ func (l *Level) Get(key []byte) ([]byte, error) {
 	ro.Close()
 	return bs, err
 }
+// Delete the record by key
+// Concurrent-safe
 func (l *Level) Delete(key []byte) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+    wo := levigo.NewWriteOptions()
+    l.db.Delete(wo,key)
+    wo.Close()
 }
 func (l *Level) Close() {
 	l.db.Close()
