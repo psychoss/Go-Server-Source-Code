@@ -42,7 +42,7 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 			Url:         BASE_URL + string(key) + "/",
 		}
 		content := []byte(artical.RenderInLayout(layout, &page))
-        go cacheFile(PATH_CACHE +string(key) +EXTENSION_HTML,content)
+		go cacheFile(PATH_CACHE+string(key)+EXTENSION_HTML, content)
 		w.Write(content)
 	} else {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
@@ -51,18 +51,12 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 }
 func getHandler(w http.ResponseWriter, req *http.Request) {
 	crossDomain(w)
-	bs, err := ioutil.ReadAll(req.Body)
+	v, err := parseRequestJSON(req)
 	if err != nil {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
 	}
-	var v interface{}
-	err = json.Unmarshal(bs, &v)
-	if err != nil {
-		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
-		return
-	}
-	m := v.(map[string]interface{})
+	m := (*v).(map[string]interface{})
 	href, token := []byte(m["Id"].(string)), []byte(m["token"].(string))
 	lbs, err := leveldb.Get([]byte(KEY_ADMIN_CERTIFICATION_TOKEN))
 	if err != nil {
@@ -70,7 +64,7 @@ func getHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if bytes.Equal(token, lbs) {
-		bs, err = leveldb.Get(href)
+		bs, err := leveldb.Get(href)
 		if err != nil {
 			http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 			return
@@ -83,18 +77,12 @@ func getHandler(w http.ResponseWriter, req *http.Request) {
 }
 func updateHandler(w http.ResponseWriter, req *http.Request) {
 	crossDomain(w)
-	bs, err := ioutil.ReadAll(req.Body)
+	v, err := parseRequestJSON(req)
 	if err != nil {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
 	}
-	var v interface{}
-	err = json.Unmarshal(bs, &v)
-	if err != nil {
-		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
-		return
-	}
-	m := v.(map[string]interface{})
+	m := (*v).(map[string]interface{})
 	href, content, token := []byte(m["href"].(string)), []byte(m["content"].(string)), []byte(m["token"].(string))
 	lbs, err := leveldb.Get([]byte(KEY_ADMIN_CERTIFICATION_TOKEN))
 	if err != nil {
