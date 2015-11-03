@@ -1,3 +1,7 @@
+/*
+a smiple web server for http://www.mean101.com
+backend for the nginx
+*/
 package server
 import (
 	"fmt"
@@ -7,13 +11,29 @@ import (
 	"web/rubex"
 )
 var (
-	rxp       *rubex.Regexp
+	// regular expression for match the request for  articles
+	rxp *rubex.Regexp
+	// regular expression for match the request for static files
 	staticRxp *rubex.Regexp
-	leveldb   *level.Level
+	// the wrapper for leveldb
+	leveldb *level.Level
 )
+// the holder for request handler
 type RequestHandler struct {
 }
+// the main function for process the request
 func (*RequestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// recover any possible panic
+	// this defer function must place first in the sequence
+	// because the nature of the defer
+	// in-first then out-last
+	// in other word，make sure this defer preform at the end of function
+	defer func() {
+		if err := recover(); err != nil {
+			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		}
+	}()
+	// in the future, may need to optimize the router
 	filter(w, req)
 }
 func filter(w http.ResponseWriter, req *http.Request) {
@@ -31,22 +51,25 @@ func filter(w http.ResponseWriter, req *http.Request) {
 			updateHandler(w, req)
 		} else if url == "/post" {
 			getHandler(w, req)
+		} else if url == "/signin" {
+			signinHandler(w, req)
 		}
 	}
-	fmt.Println(url)
 }
 // Cache the file for nginx
 func cacheFile(fileName string, datas []byte) {
 	ioutil.WriteFile(PATH_CACHE+fileName+".html", datas, 07777)
 }
 // 允许跨域方法
-// Allow cross
+// Allow cross-domain
 func crossDomain(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 }
+// Close the LevelDB
 func Close() {
 	leveldb.Close()
 }
+// Start the Server
 func StartNewServer(address string) error {
 	var err error
 	serverHandler := &RequestHandler{}

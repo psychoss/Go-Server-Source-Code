@@ -1,7 +1,7 @@
 package server
 import (
 	"bytes"
-	"fmt"
+	//"fmt"
 	"net/http"
 	//"web/level"
 	"strings"
@@ -40,6 +40,7 @@ func init() {
 }
 // Handle the home page request.
 func indexHandler(w http.ResponseWriter, req *http.Request) {
+
 	layout, err := template.ParseFile(PATH_PUBLIC + TEMPLATE_LAYOUT)
 	if err != nil {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
@@ -51,29 +52,18 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
-	mapOutput := map[string]interface{}{"Title": TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getCarousel(), "Script": getScript(), "Items": leveldb.GetRandomContents(20, &Filter{})}
+	mapOutput := map[string]interface{}{"Title": TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
 	content := []byte(index.RenderInLayout(layout, mapOutput))
 	w.Write(content)
 	go cacheFile(PATH_CACHE+"index"+EXTENSION_HTML, content)
 }
-func getCarousel() string {
-	key := []byte(PREFIX_INDEX + util.Time.NowShortDateTime())
+func getAddition(prefix string) string {
+	key := []byte(prefix + util.Time.NowShortDateTime())
 	bs, err := leveldb.Get(key)
 	if err != nil || len(bs) == 0 {
-		key = []byte(PREFIX_INDEX + "default")
+		key = []byte(prefix + "default")
 		bs, _ = leveldb.Get(key)
 	}
-	fmt.Println(len(bs))
-	return string(bs)
-}
-func getScript() string {
-	key := []byte(PREFIX_SCRIPT + util.Time.NowShortDateTime())
-	bs, err := leveldb.Get(key)
-	if err != nil || len(bs) == 0 {
-		key = []byte(PREFIX_SCRIPT + "default")
-		bs, _ = leveldb.Get(key)
-	}
-	fmt.Println(len(bs))
 	return string(bs)
 }
 // go run /home/psycho/go/src/web/server/index.go

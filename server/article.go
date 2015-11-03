@@ -1,12 +1,10 @@
 package server
 import (
 	"bytes"
-	"encoding/json"
+	"fmt"
 	"github.com/russross/blackfriday"
-	"io/ioutil"
 	"net/http"
 	"web/template"
-	//"fmt"
 )
 func convertToHTML(input []byte) string {
 	return string(blackfriday.MarkdownCommon(input))
@@ -50,6 +48,7 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 func getHandler(w http.ResponseWriter, req *http.Request) {
+	
 	crossDomain(w)
 	v, err := parseRequestJSON(req)
 	if err != nil {
@@ -76,6 +75,11 @@ func getHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 func updateHandler(w http.ResponseWriter, req *http.Request) {
+	defer func() {
+		if err := recover(); err != nil {
+			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		}
+	}()
 	crossDomain(w)
 	v, err := parseRequestJSON(req)
 	if err != nil {
@@ -99,5 +103,10 @@ func updateHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
 	}
+	defer func() {
+		if err := recover(); err != nil {
+			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		}
+	}()
 }
 // go run /home/psycho/go/src/web/server/article.go
