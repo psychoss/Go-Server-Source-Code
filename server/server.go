@@ -38,6 +38,8 @@ func filter(w http.ResponseWriter, req *http.Request) {
 func cacheFile(fileName string, datas []byte) {
 	ioutil.WriteFile(CACHE_PATH+fileName+".html", datas, 07777)
 }
+// 允许跨域方法
+// Allow cross
 func crossDomain(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 }

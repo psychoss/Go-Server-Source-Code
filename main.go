@@ -1,6 +1,5 @@
 package main
 import (
-	//"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -9,7 +8,8 @@ import (
 )
 const (
 	LOG_FILE = "app.log"
-	ADREES   = "localhost:9091"
+    // the address 
+	ADDRESS   = "localhost:9091"
 )
 var (
 	logFile *os.File
@@ -22,6 +22,7 @@ func handleExitSignal() {
 			fmt.Println(sig)
 			log.Print("Program is exiting.\n")
 			logFile.Close()
+            server.Close()
 			os.Exit(1)
 		}
 	}()
@@ -32,6 +33,6 @@ func init() {
 	handleExitSignal()
 }
 func main() {
-	server.StartNewServer(ADREES)
+	server.StartNewServer(ADDRESS)
 }
 // go run /home/psycho/go/src/web/main.go
