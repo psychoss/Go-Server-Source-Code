@@ -76,6 +76,9 @@ func (l *Level) GetRandomContents(amout int, filter Filter) []interface{} {
 		}
 		//读取内容
 		r, err := l.db.Get(ro, key)
+		if len(r) == 0 {
+			continue
+		}
 		if err != nil {
 			break
 		}
@@ -138,9 +141,9 @@ func (l *Level) Get(key []byte) ([]byte, error) {
 func (l *Level) Delete(key []byte) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-    wo := levigo.NewWriteOptions()
-    l.db.Delete(wo,key)
-    wo.Close()
+	wo := levigo.NewWriteOptions()
+	l.db.Delete(wo, key)
+	wo.Close()
 }
 func (l *Level) Close() {
 	l.db.Close()

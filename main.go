@@ -1,4 +1,12 @@
 package main
+/*
+The follow list maybe need to care:
+1. when post the article to the sever,make sure the content
+   isnt contains the character sequence like "^^^"
+2. before run the application, make sure inserted the administrator account
+3. make sure check the consts, whether they are all suit for the environment which the server depending
+
+*/
 import (
 	"fmt"
 	"os"
