@@ -45,14 +45,17 @@ func filter(w http.ResponseWriter, req *http.Request) {
 	bu := []byte(url)
 	if url == "/" {
 		indexHandler(w, req)
-	} else if rxp.Match(bu) {
-		fecthHandler(w, req)
-	} else if anthorRxp.Match(bu) {
-		fecthHandler(w, req)
-	} else if staticRxp.Match(bu) {
-		staticHandler(w, url)
-	}
-	if req.Method == "POST" {
+	} else if req.Method == "GET" {
+		if rxp.Match(bu) {
+			fecthHandler(w, req)
+		} else if anthorRxp.Match(bu) {
+			fecthHandler(w, req)
+		} else if staticRxp.Match(bu) {
+			staticHandler(w, url)
+		} else {
+			http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
+		}
+	} else if req.Method == "POST" {
 		if url == "/comment" {
 			putCommentHandler(w, req)
 		} else if url == "/comment/get" { /*for fectch the comments*/
@@ -65,9 +68,12 @@ func filter(w http.ResponseWriter, req *http.Request) {
 			signinHandler(w, req)
 		} else if url == "/signup" {
 			signupHandler(w, req)
+		} else {
+			http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		}
+	} else {
+		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 	}
-	http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 }
 // Cache the file for nginx
 func cacheFile(fileName string, datas []byte) {
