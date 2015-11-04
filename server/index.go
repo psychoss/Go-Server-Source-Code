@@ -52,7 +52,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
-	mapOutput := map[string]interface{}{"Title": TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
+	mapOutput := map[string]interface{}{"Title": "炫酷的网站技术"+TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
 	content := []byte(index.RenderInLayout(layout, mapOutput))
 	w.Write(content)
 	go cacheFile("index", content)

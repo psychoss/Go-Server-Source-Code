@@ -22,7 +22,7 @@ const (
 	PREFIX_COMMENT                = "z-comment-"
 	TEMPLATE_INDEX                = "/templates/index.html"
 	TEMPLATE_LAYOUT               = "/templates/layout.html"
-	TITLE                         = "炫酷的网站技术 - GO+"
+	TITLE                         = " - GO+"
 	EXTENSION_HTML                = ".html"
 )
 // go run /home/psycho/go/src/web/server/const.go
