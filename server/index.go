@@ -5,13 +5,9 @@ import (
 	"net/http"
 	//"web/level"
 	"strings"
-	"web/rubex"
+	//"web/rubex"
 	"web/template"
 	"web/util"
-)
-// the regexp for check the key
-var (
-	filterRxp *rubex.Regexp
 )
 // the item of the home page
 type Item struct {
@@ -25,7 +21,7 @@ func (i *Item) BuildLanguage() (map[string]string, error) {
 type Filter struct {
 }
 func (*Filter) Accept(key []byte) bool {
-	return filterRxp.Match(key)
+	return rxp.Match(key)
 }
 func (*Filter) Process(key, value []byte) interface{} {
 	separated := bytes.Split(value, []byte(DELIMITER))
@@ -35,12 +31,8 @@ func (*Filter) Process(key, value []byte) interface{} {
 		return nil
 	}
 }
-func init() {
-	filterRxp = rubex.MustCompile("^(?:css|rethinkdb|go|mongo|node|rust|python)\\-")
-}
 // Handle the home page request.
 func indexHandler(w http.ResponseWriter, req *http.Request) {
-
 	layout, err := template.ParseFile(PATH_PUBLIC + TEMPLATE_LAYOUT)
 	if err != nil {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
@@ -52,7 +44,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 		return
 	}
-	mapOutput := map[string]interface{}{"Title": "炫酷的网站技术"+TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
+	mapOutput := map[string]interface{}{"Title": "炫酷的网站技术" + TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
 	content := []byte(index.RenderInLayout(layout, mapOutput))
 	w.Write(content)
 	go cacheFile("index", content)

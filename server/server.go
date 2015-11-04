@@ -18,8 +18,9 @@ var (
 	// regular expression for match the request for static files
 	staticRxp *rubex.Regexp
 	// the wrapper for leveldb
-	leveldb *level.Level
-	secret  []byte
+	leveldb   *level.Level
+	secret    []byte
+	anthorRxp *rubex.Regexp
 )
 // the holder for request handler
 type RequestHandler struct {
@@ -44,10 +45,12 @@ func filter(w http.ResponseWriter, req *http.Request) {
 	bu := []byte(url)
 	if url == "/" {
 		indexHandler(w, req)
-	} else if staticRxp.Match(bu) {
-		staticHandler(w, url)
 	} else if rxp.Match(bu) {
 		fecthHandler(w, req)
+	} else if anthorRxp.Match(bu) {
+		fecthHandler(w, req)
+	} else if staticRxp.Match(bu) {
+		staticHandler(w, url)
 	}
 	if req.Method == "POST" {
 		if url == "/comment" {
@@ -64,6 +67,7 @@ func filter(w http.ResponseWriter, req *http.Request) {
 			signupHandler(w, req)
 		}
 	}
+	http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
 }
 // Cache the file for nginx
 func cacheFile(fileName string, datas []byte) {
@@ -90,8 +94,8 @@ func StartNewServer(address string) error {
 	if err != nil {
 		return err
 	}
-	
-	rxp = rubex.MustCompile("^/(?:css|go|mongo|node|python|rethinkdb|rust)[\\-a-zA-Z0-9/]*$")
+	anthorRxp = rubex.MustCompile("^/(?:about|contact-us|copyright-affirm|help)")
+	rxp = rubex.MustCompile("^/(?:css|go|mongo|node|python|rethinkdb|rust|nginx)[\\-a-zA-Z0-9/]*$")
 	staticRxp = rubex.MustCompile("\\.(?:jpg|jpeg|png|gif|woff2|woff|js|css|html|ico)$")
 	secret, err = leveldb.Get([]byte(KEY_ADMIN_CERTIFICATION_TOKEN))
 	if err != nil {

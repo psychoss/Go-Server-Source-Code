@@ -8,7 +8,7 @@ const (
 	ERROR_BAD_REQUEST             = "You must provide the certification."
 	ERROR_NOT_PERMISSION          = "You don't currently have permission to post this article."
 	ERROR_SERVER_INTERNAL         = "Sorry, An internal Server Error occurred."
-	ERROR_TEMPLATE_NOT_FOUND      = "The target template file not found!"
+	ERROR_TEMPLATE_NOT_FOUND      = "The page not found!"
 	KEYWORD                       = "Go语言，SVG 动画，Canvas 动画，MongoDB，RethinkDB，Node.js,Rust 语言，Python"
 	KEY_ADMIN_CERTIFICATION_TOKEN = "admin-account"
 	KEY_COLLECTOR                 = "-keycollotor"
