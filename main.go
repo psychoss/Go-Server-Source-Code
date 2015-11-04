@@ -16,7 +16,7 @@ import (
 )
 const (
     // the log file path
-	LOG_FILE = "app.log"
+	LOG_FILE = "/home/psycho/public/log/app.log"
     // the address 
 	ADDRESS   = "localhost:9091"
 )

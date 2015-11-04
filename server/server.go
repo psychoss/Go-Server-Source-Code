@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"web/level"
 	"web/log"
 	"web/rubex"
@@ -51,6 +52,8 @@ func filter(w http.ResponseWriter, req *http.Request) {
 	if req.Method == "POST" {
 		if url == "/comment" {
 			putCommentHandler(w, req)
+		} else if url == "/comment/get" { /*for fectch the comments*/
+			getCommentHandler(w, req)
 		} else if url == "/update" {
 			updateHandler(w, req)
 		} else if url == "/post" {
@@ -64,7 +67,11 @@ func filter(w http.ResponseWriter, req *http.Request) {
 }
 // Cache the file for nginx
 func cacheFile(fileName string, datas []byte) {
-	ioutil.WriteFile(PATH_CACHE+fileName+".html", datas, 07777)
+	ioutil.WriteFile(PATH_CACHE+fileName+".html", datas, 0777)
+}
+func removeFile(fileName string) {
+	os.Remove(PATH_CACHE + fileName + ".html")
+	os.Remove(PATH_CACHE + "index.html")
 }
 // 允许跨域方法
 // Allow cross-domain
@@ -83,6 +90,7 @@ func StartNewServer(address string) error {
 	if err != nil {
 		return err
 	}
+	
 	rxp = rubex.MustCompile("^/(?:css|go|mongo|node|python|rethinkdb|rust)[\\-a-zA-Z0-9/]*$")
 	staticRxp = rubex.MustCompile("\\.(?:jpg|jpeg|png|gif|woff2|woff|js|css|html|ico)$")
 	secret, err = leveldb.Get([]byte(KEY_ADMIN_CERTIFICATION_TOKEN))

@@ -1,12 +1,13 @@
 package server
 import (
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 	"web/jwt"
+	"web/util"
 )
 // Handle the request for the comments.
 func getCommentHandler(w http.ResponseWriter, req *http.Request) {
@@ -16,11 +17,12 @@ func getCommentHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, ERROR_BAD_REQUEST, http.StatusBadRequest)
 		return
 	}
-	bs, err = leveldb.Get(bs)
-	if err != nil {
-		http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
-		return
-	}
+	//	if err != nil {
+	//		http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
+	//		return
+	//	}
+	bs = leveldb.GetAllKeysByAnchor(util.Union([]byte(PREFIX_COMMENT), bs))
+	//fmt.Println(string(bs))
 	w.Write(bs)
 }
 func putCommentHandler(w http.ResponseWriter, req *http.Request) {
@@ -37,7 +39,8 @@ func putCommentHandler(w http.ResponseWriter, req *http.Request) {
 	// type assert to string will be cause a panic
 	// if not recover from this
 	// the whole application will be stop
-	href, token, content := m["href"].(string), m["token"].(string), m["content"].(string)
+    fmt.Println(m)
+	username, href, token, content := m["username"].(string), m["href"].(string), m["token"].(string), m["content"].(string)
 	// check the token
 	valide, err := jwt.CheckToken(token, string(secret))
 	// check the error
@@ -52,21 +55,21 @@ func putCommentHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	// use the microsecond as the suffix
 	time := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-	// the refid is a reference to the comment which the user reply to 
+	// the refid is a reference to the comment which the user reply to
 	refid := m["refid"]
-    // the holde for the data which will be used to insert into the leveldb
+	// the holde for the data which will be used to insert into the leveldb
 	var bs []byte
+	id := PREFIX_COMMENT + href + time
 	if refid == nil {
-		bs, err = json.Marshal(map[string]string{"created": time, "content": content})
+		bs, err = json.Marshal(map[string]string{"username": username, "id": id, "created": time, "content": content})
 	} else {
-		bs, err = json.Marshal(map[string]string{"created": time, "content": content, "refid": refid.(string)})
+		bs, err = json.Marshal(map[string]string{"username": username, "id": id, "created": time, "content": content, "refid": refid.(string)})
 	}
 	if err != nil {
 		http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 		return
 	}
-	key := []byte(PREFIX_COMMENT + href + time)
-	err = leveldb.Put(key, bs)
+	err = leveldb.Put([]byte(id), bs)
 	if err != nil {
 		http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 		return
@@ -75,6 +78,6 @@ func putCommentHandler(w http.ResponseWriter, req *http.Request) {
 	// The anchor is for find the range of the comments
 	// Make sure the anchor have been inserted
 	leveldb.Put(anchor, anchor)
-	w.Write(key)
+	w.Write([]byte(id))
 }
 // go run /home/psycho/go/src/web/server/comment.go

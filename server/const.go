@@ -1,8 +1,8 @@
 package server
 const (
-	//BASE_URL = "http://www.mean101.com/"
+	BASE_URL = "http://www.mean101.com/"
 	TEMPLATE_ARTICAL              = "/templates/doc.html"
-	BASE_URL                      = "http://localhost:9091/"
+	//BASE_URL                      = "http://localhost:9091/"
 	DELIMITER                     = "^^^"
 	DESCRIPTION                   = "Go语言，炫酷动画，建站技术，尽在Go+。"
 	ERROR_BAD_REQUEST             = "You must provide the certification."

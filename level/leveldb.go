@@ -1,6 +1,7 @@
 package level
 import (
 	//"bytes"
+	"bytes"
 	"fmt"
 	"github.com/jmhodges/levigo"
 	"math/rand"
@@ -86,6 +87,35 @@ func (l *Level) GetRandomContents(amout int, filter Filter) []interface{} {
 		stopPos--
 	}
 	return v
+}
+func (l *Level) GetAllKeysByAnchor(anchor []byte) []byte {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	var buffer bytes.Buffer
+	ro := levigo.NewReadOptions()
+	defer ro.Close()
+	ro.SetFillCache(false)
+	it := l.db.NewIterator(ro)
+	defer it.Close()
+	buffer.WriteByte('[')
+	it.Seek(anchor)
+	if !it.Valid() {
+		return nil
+	}
+	it.Next()
+	for it.Valid() && bytes.HasPrefix(it.Key(), anchor) {
+		buffer.Write(it.Value())
+		buffer.WriteByte(',')
+		it.Next()
+        
+	}
+	bs := buffer.Bytes()
+	bs = bytes.TrimRight(bs, ",")
+	bs = append(bs, ']')
+	if err := it.GetError(); err != nil {
+		fmt.Println(err)
+	}
+	return bs
 }
 func (l *Level) GetAllKeys() [][]byte {
 	l.mu.Lock()

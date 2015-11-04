@@ -55,7 +55,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 	mapOutput := map[string]interface{}{"Title": TITLE, "Keyword": KEYWORD, "Description": DESCRIPTION, "Base": BASE_URL, "Url": BASE_URL, "Carousel": getAddition(PREFIX_INDEX), "Script": getAddition(PREFIX_SCRIPT), "Items": leveldb.GetRandomContents(20, &Filter{})}
 	content := []byte(index.RenderInLayout(layout, mapOutput))
 	w.Write(content)
-	go cacheFile(PATH_CACHE+"index"+EXTENSION_HTML, content)
+	go cacheFile("index", content)
 }
 func getAddition(prefix string) string {
 	key := []byte(prefix + util.NowShortDateTime())

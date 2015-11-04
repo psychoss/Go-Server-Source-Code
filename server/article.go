@@ -40,7 +40,7 @@ func fecthHandler(w http.ResponseWriter, req *http.Request) {
 			Url:         BASE_URL + string(key) + "/",
 		}
 		content := []byte(artical.RenderInLayout(layout, &page))
-		go cacheFile(PATH_CACHE+string(key)+EXTENSION_HTML, content)
+		go cacheFile(string(key), content)
 		w.Write(content)
 	} else {
 		http.Error(w, ERROR_TEMPLATE_NOT_FOUND, http.StatusNotFound)
@@ -95,6 +95,7 @@ func updateHandler(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, ERROR_SERVER_INTERNAL, http.StatusInternalServerError)
 			return
 		}
+        go removeFile(string(href))
 	} else {
 		http.Error(w, ERROR_NOT_PERMISSION, http.StatusNotAcceptable)
 		return
